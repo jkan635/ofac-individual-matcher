@@ -15,6 +15,7 @@ export default function Home() {
   const [country, setCountry] = useState<Country | null>(null);
   const [validated, setValidated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [hasResponse, setHasResponse] = useState(false);
   const [nameMatched, setNameMatched] = useState(false);
   const [dobMatched, setDobMatched] = useState(false);
@@ -28,11 +29,20 @@ export default function Home() {
 
   const onButtonClick = async () => {
     setIsLoading(true);
+    setHasResponse(false);
+    setHasError(false);
     const resp = await postIndividualScreen(name, dobString, country?.countryName);
     // const resp = await postIndividualScreen("Abu Abbas", "1996-09-07", "Canada");
     const json = await resp.json();
+
+    if (!json || !json.matches) {
+      setHasError(true);
+      setIsLoading(false);
+      return;
+    }
+
     setHasResponse(true);
-    let matches = json  && json.matches ? json.matches : [];
+    let matches = json.matches;
     
     for (let i=0; i<matches.length; i++) {
       const match = matches[i];
@@ -85,18 +95,24 @@ export default function Home() {
 
           {hasResponse && 
             <div className="mt-14 flex flex-col gap-4 w-1/2">
+              <div className="text-base font-medium text-center text-gray-400">{nameMatched || dobMatched || countryMatched ? 'Hit' : 'Clear'}</div>
               <div className="flex flex-row w-full justify-between items-center">
                 <div className="text-sm font-medium text-left text-gray-400">Name: {name}</div>
-                <div className="text-sm font-medium text-right text-gray-400">{nameMatched ? "Match" : "No Match" }</div>
+                <div className="text-sm font-medium text-right text-gray-400">{nameMatched ? "✅" : "❌" }</div>
               </div>
               <div className="flex flex-row w-full justify-between items-center">
                 <div className="text-sm font-medium text-left text-gray-400">Date of Birth: {dobString}</div>
-                <div className="text-sm font-medium text-right text-gray-400">{dobMatched ? "Match" : "No Match" }</div>
+                <div className="text-sm font-medium text-right text-gray-400">{dobMatched ? "✅" : "❌" }</div>
               </div>
               <div className="flex flex-row w-full justify-between items-center">
                 <div className="text-sm font-medium text-left text-gray-400">Country: {country?.countryName}</div>
-                <div className="text-sm font-medium text-right text-gray-400">{countryMatched ? "Match" : "No Match" }</div>
+                <div className="text-sm font-medium text-right text-gray-400">{countryMatched ? "✅" : "❌" }</div>
               </div>
+            </div>
+          }
+          {hasError && 
+            <div className="mt-14 flex flex-col gap-4 w-1/2">
+                <div className="text-sm font-medium text-center text-gray-400">There was an error find a match</div>
             </div>
           }
         </div>
