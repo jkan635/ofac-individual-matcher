@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     const requestBody = {
-        "apiKey": "0f70a0f2-33d9-4263-9d81-105068c20bd9", // Normally this would be stored in the enviroment or somewheres else
+        "apiKey": "insert_api_key", // Normally this would be stored in the enviroment or somewheres else
         "cases": [{
             "name": name,
             "dob": dob,
